@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.File;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collections;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.http.ResponseEntity;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
@@ -39,6 +44,10 @@ public class SmaatoAcceptService {
     private final RestTemplate restTemplate = new RestTemplate();
     Set<Integer> threadSafeSet = ConcurrentHashMap.newKeySet();
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    String kafkaTopic = "java_in_smaato_send";
     public void getResStatus(Integer id,String endpoint)
             throws IOException {
         try{
@@ -110,6 +119,7 @@ public class SmaatoAcceptService {
             PrintWriter out = new PrintWriter(new FileWriter(log, true));
             out.append("Time: " + dtf.format(now) + " Total response: " + totalresp + " Response " + response + "\n");
             out.close();
+            //sendlogtoKafka("Time: " + dtf.format(now) + " Total response: " + totalresp + " Response " + response);
         }catch(IOException e){
             System.out.println("COULD NOT LOG!");
         }
@@ -128,9 +138,14 @@ public class SmaatoAcceptService {
             PrintWriter out = new PrintWriter(new FileWriter(log, true));
             out.append("Time: " + dtf.format(now) + " Response " + response + "\n");
             out.close();
+            //sendlogtoKafka("Time: " + dtf.format(now) + " Response " + response);
         }catch(IOException e){
             System.out.println("COULD NOT LOG!");
         }
+    }
+    public void sendlogtoKafka(String message) {
+
+        kafkaTemplate.send(kafkaTopic, message);
     }
     @Scheduled(cron = "0 * * * * *")
     private void logRespCount(){
