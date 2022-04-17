@@ -39,17 +39,21 @@ public class SmaatoAcceptService {
     private final RestTemplate restTemplate = new RestTemplate();
     Set<Integer> threadSafeSet = ConcurrentHashMap.newKeySet();
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
-    public void writeresplog(Integer id,String endpoint)
+    public void getResStatus(Integer id,String endpoint)
             throws IOException {
         try{
             threadSafeSet.add(id);
             totalresp= Long.valueOf(threadSafeSet.size());
             if (endpoint != null&&!endpoint.isEmpty()) {
+                //System.out.println("Testing 1 - Send Http Get request");
+                //sendGet(endpoint);
                 System.out.println("Testing 2 - Send Http POST request");
                 sendPost(endpoint);
 
             }else {
-                writeResponse();
+                int statusCode = 200;
+                String message = HttpStatus.valueOf(statusCode).getReasonPhrase();
+                writeResponse(message);
             }
         }
         catch(Exception e){
@@ -60,30 +64,16 @@ public class SmaatoAcceptService {
         }
     }
     private void sendGet(String url) throws Exception {
-
         HttpGet request = new HttpGet(url+"?id="+totalresp);
-
         // add request headers
         request.addHeader("custom-key", "smaato");
-        request.addHeader(HttpHeaders.USER_AGENT, "Googlebot");
 
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-
-            // Get HttpResponse Status
-            System.out.println(response.getStatusLine().toString());
-
-            HttpEntity entity = response.getEntity();
-            Header headers = entity.getContentType();
-            System.out.println(headers);
-
-            if (entity != null) {
-                // return it as a String
-                String result = EntityUtils.toString(entity);
-                System.out.println(result);
-            }
-
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(request)) {
+            //System.out.println(EntityUtils.toString(response.getEntity()));
+            String respstr=EntityUtils.toString(response.getEntity());
+            writeResponse(respstr);
         }
-
     }
     private void sendPost(String url) throws Exception {
 
@@ -103,13 +93,12 @@ public class SmaatoAcceptService {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)) {
             System.out.println(EntityUtils.toString(response.getEntity()));
+            writeResponse(EntityUtils.toString(response.getEntity()));
         }
-
     }
-
-    public void writeResponse() {
+    public void writeResponse(String response) {
         try {
-            HttpStatus response = HttpStatus.OK;
+            //HttpStatus response = HttpStatus.OK;
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             System.out.println(dtf.format(now));

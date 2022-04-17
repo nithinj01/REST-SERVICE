@@ -22,7 +22,7 @@ public class SmaatoController {
     @GetMapping("/api/smaato/accept")
     public String getDetails(@RequestParam(name = "id") Integer id,@RequestParam(required = false) String endpoint) throws IOException {
         try {
-            acceptService.writeresplog(id,endpoint);
+            acceptService.getResStatus(id,endpoint);
             return "ok";
         }
         catch (Exception e) {
