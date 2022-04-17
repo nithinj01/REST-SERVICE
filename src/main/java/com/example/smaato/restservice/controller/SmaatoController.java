@@ -32,7 +32,7 @@ public class SmaatoController {
     @RequestMapping(value = "/smaatopost", method = RequestMethod.POST)
     public ResponseEntity < String > postSmaato(@RequestBody SmaatoAccept accept) {
         try {
-            acceptService.writePostResponse();
+            //acceptService.writePostResponse();
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         catch (Exception e) {
