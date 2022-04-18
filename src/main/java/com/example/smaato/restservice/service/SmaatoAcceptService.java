@@ -161,7 +161,7 @@ public class SmaatoAcceptService {
                 LocalDateTime now = LocalDateTime.now();
                 System.out.println(dtf.format(now));
                 PrintWriter out = new PrintWriter(new FileWriter(log, true));
-                out.append("Time: "+dtf.format(now)+" Total response: " + totalresp + "  " + "Response: " + response + "\n");
+                out.append("Time: "+dtf.format(now)+" Total requests: " + totalresp + "\n");
                 out.close();
                 threadSafeSet.clear();
                 totalresp=Long.valueOf(threadSafeSet.size());
