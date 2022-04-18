@@ -101,11 +101,12 @@ public class SmaatoAcceptService {
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)) {
-            System.out.println(EntityUtils.toString(response.getEntity()));
-            writeResponse(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
+            int resp=response.getStatusLine().getStatusCode();
+            writeResponse(Integer.toString(resp));
         }
     }
-    public void writeResponse(String response) {
+    public synchronized void writeResponse(String response) {
         try {
             //HttpStatus response = HttpStatus.OK;
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -124,7 +125,7 @@ public class SmaatoAcceptService {
             System.out.println("COULD NOT LOG!");
         }
     }
-    public void writePostResponse() {
+    public synchronized void writePostResponse() {
         try {
             HttpStatus response = HttpStatus.CREATED;
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -162,6 +163,8 @@ public class SmaatoAcceptService {
                 PrintWriter out = new PrintWriter(new FileWriter(log, true));
                 out.append("Time: "+dtf.format(now)+" Total response: " + totalresp + "  " + "Response: " + response + "\n");
                 out.close();
+                threadSafeSet.clear();
+                totalresp=Long.valueOf(threadSafeSet.size());
             }
         }catch(IOException e){
             System.out.println("COULD NOT LOG!");
