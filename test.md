@@ -2,34 +2,34 @@
 
 ```mermaid
 graph TD
-  subgraph Data Ingestion
+  subgraph DataIngestion
     A[Sources (Partners, Hotels)]
     B[Google Cloud Storage (Apache Kafka)]
     A --> B
   end
 
-  subgraph Data Storage
+  subgraph DataStorage
     C[Google Cloud Storage (Images)]
     D[Google BigQuery (Metadata)]
     B --> C
     B --> D
   end
 
-  subgraph Feature Extraction
+  subgraph FeatureExtraction
     E[Google AI Platform (ML Models)]
     F[Google BigQuery (Extracted Features)]
     C --> E
     E --> F
   end
 
-  subgraph Main Image Selection
+  subgraph MainImageSelection
     G[Google Compute Engine (GKE)]
     H[Google BigQuery (Selected Images)]
     F --> G
     G --> H
   end
 
-  subgraph Output Generation
+  subgraph OutputGeneration
     I[APIs (Snapshots)]
     J[Google BigQuery (Changes)]
     H --> I
@@ -52,4 +52,3 @@ graph TD
   style I fill:#E6E6FA,stroke:#000,stroke-width:2px;
   style J fill:#E6E6FA,stroke:#000,stroke-width:2px;
   style K fill:#E6E6FA,stroke:#000,stroke-width:2px;
-
